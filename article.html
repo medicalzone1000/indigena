@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>Indigena • جاري التحميل…</title>
+  <meta name="description" content="">
+  <meta name="theme-color" content="#1a110a">
+
+  <!-- Open Graph (filled dynamically) -->
+  <meta property="og:title"       content="" id="og-title">
+  <meta property="og:description" content="" id="og-desc">
+  <meta property="og:type"        content="article">
+  <meta property="og:locale"      content="ar_AR">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=Cairo:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css">
+
+  <style>
+    /* Article-specific additions */
+    .article-page-wrap {
+      min-height: 100vh;
+    }
+
+    /* Sticky reading progress under navbar */
+    #reading-progress {
+      position: fixed;
+      top: var(--navbar-h);
+      right: 0;
+      left: 0;
+      height: 3px;
+      background: var(--clr-border);
+      z-index: 900;
+      pointer-events: none;
+    }
+    #reading-progress-bar {
+      height: 100%;
+      background: linear-gradient(90deg, var(--clr-forest-mid), var(--clr-gold));
+      width: 0%;
+      transition: width 80ms linear;
+    }
+
+    /* Related Posts */
+    .related-section {
+      background: var(--clr-surface-2);
+      padding: var(--sp-12) 0;
+      margin-top: var(--sp-12);
+    }
+    .related-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: var(--sp-5);
+      margin-top: var(--sp-8);
+    }
+    .related-card {
+      background: var(--clr-surface);
+      border-radius: var(--radius-lg);
+      overflow: hidden;
+      cursor: pointer;
+      border: 1px solid var(--clr-border);
+      transition: all var(--dur-mid) var(--ease-smooth);
+      display: flex;
+      flex-direction: column;
+    }
+    .related-card:hover {
+      transform: translateY(-6px);
+      box-shadow: var(--shadow-md);
+      border-color: var(--clr-border-gold);
+    }
+    .related-card .post-img { height: 170px; }
+    .related-card .post-content { padding: var(--sp-4) var(--sp-5); }
+    .related-card h4 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--clr-earth);
+      line-height: 1.4;
+      transition: color var(--dur-fast);
+    }
+    .related-card:hover h4 { color: var(--clr-gold); }
+
+    /* Article loading state */
+    .article-loading {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: var(--sp-4);
+      color: var(--clr-text-muted);
+    }
+    .article-loading i {
+      font-size: 2.5rem;
+      color: var(--clr-gold);
+      animation: spin 1.2s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* Article error state */
+    .article-error {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 60vh;
+      gap: var(--sp-4);
+      text-align: center;
+      padding: var(--sp-8);
+    }
+    .article-error i { font-size: 3rem; color: var(--clr-gold); }
+    .article-error h2 { font-family: var(--font-display); font-size: 1.5rem; color: var(--clr-earth); }
+    .article-error p { color: var(--clr-text-muted); font-size: 0.9rem; }
+
+    @media (max-width: 680px) {
+      .share-buttons { flex-wrap: wrap; }
+      .related-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body class="article-page-wrap">
+
+  <!-- Scroll Progress -->
+  <div id="scroll-progress"></div>
+  <div id="reading-progress"><div id="reading-progress-bar"></div></div>
+
+  <!-- Back to Top -->
+  <button id="back-to-top" aria-label="العودة للأعلى">
+    <i class="fas fa-arrow-up"></i>
+  </button>
+
+  <!-- ===== NAVBAR ===== -->
+  <nav class="navbar" role="navigation" aria-label="التنقل الرئيسي">
+    <div class="nav-container">
+      <a href="index.html" class="logo" aria-label="Indigena الرئيسية">
+        <div class="logo-icon"><i class="fas fa-feather-alt"></i></div>
+        <div class="logo-text">
+          <span class="logo-name">Indigena</span>
+          <span class="logo-sub">Indigenous Media</span>
+        </div>
+      </a>
+      <div class="nav-links">
+        <a href="category.html?cat=%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1" class="nav-link"><i class="fas fa-newspaper"></i> أخبار</a>
+        <a href="category.html?cat=%D8%A7%D9%84%D8%B4%D8%B9%D9%88%D8%A8" class="nav-link"><i class="fas fa-globe-africa"></i> الشعوب</a>
+        <a href="category.html?cat=%D8%A7%D9%84%D8%AB%D9%82%D8%A7%D9%81%D8%A9" class="nav-link"><i class="fas fa-palette"></i> الثقافة</a>
+        <a href="category.html?cat=%D8%A7%D9%84%D8%AD%D9%82%D9%88%D9%82" class="nav-link"><i class="fas fa-gavel"></i> الحقوق</a>
+        <a href="category.html?cat=%D8%A7%D9%84%D8%A3%D8%B7%D9%84%D8%B3" class="nav-link"><i class="fas fa-map-marked-alt"></i> الأطلس</a>
+        <button class="nav-search-btn" id="searchIconNav" aria-label="بحث">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+      <button class="mobile-menu-btn" aria-label="فتح القائمة">
+        <i class="fas fa-bars"></i>
+      </button>
+    </div>
+  </nav>
+
+  <!-- ===== ARTICLE CONTAINER ===== -->
+  <div id="articleContainer">
+    <div class="article-loading">
+      <i class="fas fa-spinner"></i>
+      <p>جاري تحميل المقال…</p>
+    </div>
+  </div>
+
+  <!-- ===== RELATED POSTS (filled by JS) ===== -->
+  <section class="related-section" id="relatedSection" style="display:none" aria-label="مقالات ذات صلة">
+    <div class="container">
+      <div class="section-header">
+        <span class="section-eyebrow">اقرأ أيضاً</span>
+        <h2>مقالات ذات صلة</h2>
+        <div class="section-line"></div>
+      </div>
+      <div class="related-grid" id="relatedGrid"></div>
+    </div>
+  </section>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="footer" role="contentinfo">
+    <div class="footer-container">
+      <div class="footer-about">
+        <a href="index.html" class="logo" style="margin-bottom:1rem">
+          <div class="logo-icon"><i class="fas fa-feather-alt"></i></div>
+          <div class="logo-text">
+            <span class="logo-name">Indigena</span>
+            <span class="logo-sub">Indigenous Media</span>
+          </div>
+        </a>
+        <p>منصة إعلامية متخصصة في قضايا السكان الأصليين، ننقل الحكاية كما هي، ونوثق التراث ونناقش المستقبل.</p>
+        <div class="footer-social">
+          <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+          <a href="#" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" aria-label="Instagram"><i class="fab fa-instagram"></i></a>
+          <a href="#" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+        </div>
+      </div>
+      <div class="footer-col">
+        <h4>روابط سريعة</h4>
+        <ul>
+          <li><a href="index.html">الرئيسية</a></li>
+          <li><a href="#">اتصل بنا</a></li>
+          <li><a href="#">سياسة الخصوصية</a></li>
+        </ul>
+      </div>
+      <div class="footer-col" id="footerCategories"><h4>التصنيفات</h4><ul></ul></div>
+      <div class="footer-col footer-newsletter">
+        <h4>النشرة البريدية</h4>
+        <p>اشترك لتصلك أبرز التقارير والقصص الحصرية أسبوعياً.</p>
+        <form id="newsletterForm" class="newsletter-form" novalidate>
+          <input type="email" placeholder="بريدك الإلكتروني" required aria-label="البريد الإلكتروني">
+          <button type="submit" aria-label="اشترك"><i class="fas fa-paper-plane"></i></button>
+        </form>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 Indigena. جميع الحقوق محفوظة.</p>
+      <div><a href="#">سياسة الخصوصية</a> &nbsp;·&nbsp; <a href="#">شروط الاستخدام</a></div>
+    </div>
+  </footer>
+
+  <!-- ===== SEARCH OVERLAY ===== -->
+  <div class="search-overlay" id="searchOverlay" role="dialog" aria-modal="true">
+    <div class="search-modal">
+      <div class="search-input-wrap">
+        <i class="fas fa-search"></i>
+        <input type="text" id="searchInput" placeholder="ابحث عن مقال أو تصنيف…" autocomplete="off" spellcheck="false">
+        <i class="fas fa-times close-search" id="closeSearch" role="button" tabindex="0"></i>
+      </div>
+      <div id="searchResults" role="listbox"></div>
+    </div>
+  </div>
+
+  <script>
+  (function () {
+    'use strict';
+
+    /* ─── Utilities ─────────────────────────────── */
+    function formatDate(d) {
+      try { return new Date(d).toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' }); }
+      catch (_) { return d; }
+    }
+    function excerpt(s, n) { return s && s.length > n ? s.substring(0, n) + '…' : (s || ''); }
+    function stripHtml(h) { const t = document.createElement('div'); t.innerHTML = h; return t.textContent || ''; }
+    function readingTime(c) { return Math.max(1, Math.ceil(stripHtml(c || '').trim().split(/\s+/).length / 150)) + ' دقيقة'; }
+    function thumb(u) { return u && u.trim() ? u : 'https://placehold.co/600x400/2c1f12/e8a830?text=Indigena'; }
+    function debounce(fn, w) { let t; return function (...a) { clearTimeout(t); t = setTimeout(() => fn.apply(this, a), w); }; }
+
+    /* ─── Data ──────────────────────────────────── */
+    let allPosts = [];
+
+    async function fetchPosts() {
+      const res  = await fetch('posts.json');
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      const data = await res.json();
+      allPosts   = (data.posts || []).sort((a, b) => new Date(b.published) - new Date(a.published));
+      return allPosts;
+    }
+
+    /* ─── Reading Progress ──────────────────────── */
+    function initReadingProgress() {
+      const bar      = document.getElementById('reading-progress-bar');
+      const scrollPr = document.getElementById('scroll-progress');
+      const backTop  = document.getElementById('back-to-top');
+      if (!bar) return;
+
+      window.addEventListener('scroll', () => {
+        const scrolled = window.scrollY;
+        const article  = document.querySelector('.article-content');
+        if (article) {
+          const start = article.offsetTop;
+          const end   = article.offsetTop + article.offsetHeight - window.innerHeight;
+          const pct   = end > start ? Math.min(1, Math.max(0, (scrolled - start) / (end - start))) : 0;
+          bar.style.width = (pct * 100) + '%';
+        }
+        if (scrollPr) scrollPr.style.transform = `scaleX(${Math.min(1, scrolled / (document.documentElement.scrollHeight - window.innerHeight))})`;
+        if (backTop)  backTop.classList.toggle('visible', scrolled > 400);
+      }, { passive: true });
+
+      if (backTop) backTop.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+    }
+
+    /* ─── Render Article ────────────────────────── */
+    function renderArticle(post) {
+      // Update page title & meta
+      document.title = `${post.title} • Indigena`;
+      document.querySelector('meta[name="description"]').content = excerpt(stripHtml(post.content_preview || post.content || ''), 160);
+      document.getElementById('og-title').content  = post.title;
+      document.getElementById('og-desc').content   = excerpt(stripHtml(post.content_preview || ''), 160);
+
+      const pageUrl = window.location.href;
+      const cats    = post.categories || ['عام'];
+      const content = post.content || post.content_preview || '<p>المحتوى غير متوفر حالياً، سيتم تحديثه قريباً.</p>';
+
+      const html = `
+        <article class="article-container" itemscope itemtype="https://schema.org/Article">
+
+          <!-- Breadcrumb -->
+          <nav class="article-breadcrumb" aria-label="مسار التنقل">
+            <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+            <i class="fas fa-chevron-left"></i>
+            <a href="category.html?cat=${encodeURIComponent(cats[0])}">${cats[0]}</a>
+            <i class="fas fa-chevron-left"></i>
+            <span>${excerpt(post.title, 40)}</span>
+          </nav>
+
+          <!-- Header -->
+          <header class="article-header">
+            <div class="article-cats">
+              ${cats.map(c => `<a href="category.html?cat=${encodeURIComponent(c)}" class="article-cat-tag">${c}</a>`).join('')}
+            </div>
+            <h1 class="article-title" itemprop="headline">${post.title}</h1>
+            <div class="article-meta-bar">
+              <span><i class="far fa-calendar-alt"></i> ${formatDate(post.published)}</span>
+              <span><i class="far fa-clock"></i>
+                <span class="reading-time">${readingTime(content)}</span>
+              </span>
+              ${post.image_count ? `<span><i class="far fa-images"></i> ${post.image_count} صورة</span>` : ''}
+            </div>
+          </header>
+
+          ${post.thumbnail ? `<img src="${post.thumbnail}" alt="${post.title}" class="article-hero-img" itemprop="image" loading="eager">` : ''}
+
+          <!-- Content -->
+          <div class="article-content" itemprop="articleBody">
+            ${content}
+          </div>
+
+          <!-- Share -->
+          <div class="share-section">
+            <h4><i class="fas fa-share-alt" style="margin-left:0.5rem;color:var(--clr-gold)"></i>شارك هذا المقال</h4>
+            <div class="share-buttons">
+              <a href="https://wa.me/?text=${encodeURIComponent(post.title + ' ' + pageUrl)}" target="_blank" rel="noopener" class="share-btn">
+                <i class="fab fa-whatsapp" style="color:#25D366"></i> واتساب
+              </a>
+              <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(pageUrl)}" target="_blank" rel="noopener" class="share-btn">
+                <i class="fab fa-facebook-f" style="color:#1877F2"></i> فيسبوك
+              </a>
+              <a href="https://twitter.com/intent/tweet?url=${encodeURIComponent(pageUrl)}&text=${encodeURIComponent(post.title)}" target="_blank" rel="noopener" class="share-btn">
+                <i class="fab fa-twitter" style="color:#1DA1F2"></i> تويتر
+              </a>
+              <a href="https://www.linkedin.com/shareArticle?mini=true&url=${encodeURIComponent(pageUrl)}" target="_blank" rel="noopener" class="share-btn">
+                <i class="fab fa-linkedin-in" style="color:#0A66C2"></i> لينكدإن
+              </a>
+              <button class="share-btn" id="copyLinkBtn">
+                <i class="fas fa-link"></i> نسخ الرابط
+              </button>
+            </div>
+          </div>
+
+          <!-- Back -->
+          <a href="index.html" class="back-home">
+            <i class="fas fa-arrow-right"></i> العودة إلى الرئيسية
+          </a>
+
+        </article>`;
+
+      document.getElementById('articleContainer').innerHTML = html;
+
+      // Copy link button
+      const copyBtn = document.getElementById('copyLinkBtn');
+      if (copyBtn) {
+        copyBtn.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(pageUrl);
+            copyBtn.innerHTML = '<i class="fas fa-check" style="color:var(--clr-gold)"></i> تم النسخ!';
+            setTimeout(() => { copyBtn.innerHTML = '<i class="fas fa-link"></i> نسخ الرابط'; }, 2000);
+          } catch (_) {}
+        });
+      }
+    }
+
+    /* ─── Render Related Posts ──────────────────── */
+    function renderRelated(currentPost) {
+      const section = document.getElementById('relatedSection');
+      const grid    = document.getElementById('relatedGrid');
+      if (!section || !grid) return;
+
+      const cats    = currentPost.categories || [];
+      const related = allPosts
+        .filter(p => p.id != currentPost.id && (p.categories || []).some(c => cats.includes(c)))
+        .slice(0, 3);
+
+      if (!related.length) return;
+
+      section.style.display = 'block';
+      grid.innerHTML = related.map(post => `
+        <div class="related-card" data-id="${post.id}" tabindex="0" role="button">
+          <div class="post-img" style="height:170px;background-image:url('${thumb(post.thumbnail)}');background-size:cover;background-position:center;position:relative">
+            <span class="post-category">${post.categories?.[0] ?? 'عام'}</span>
+          </div>
+          <div class="post-content">
+            <h4>${excerpt(post.title, 65)}</h4>
+            <div class="post-meta" style="margin-top:0.75rem;padding-top:0.75rem;border-top:1px solid var(--clr-border)">
+              <span style="font-size:0.72rem;color:var(--clr-text-faint)"><i class="far fa-calendar-alt"></i> ${formatDate(post.published)}</span>
+            </div>
+          </div>
+        </div>`).join('');
+
+      grid.querySelectorAll('.related-card').forEach(card => {
+        const nav = () => { window.location.href = `article.html?id=${card.dataset.id}`; };
+        card.addEventListener('click', nav);
+        card.addEventListener('keydown', e => e.key === 'Enter' && nav());
+      });
+    }
+
+    /* ─── Footer Categories ─────────────────────── */
+    function renderFooterCategories() {
+      const list = document.querySelector('#footerCategories ul');
+      if (!list) return;
+      const cats = [...new Set(allPosts.flatMap(p => p.categories || []))].slice(0, 8);
+      list.innerHTML = cats.map(c => `<li><a href="category.html?cat=${encodeURIComponent(c)}">${c}</a></li>`).join('');
+    }
+
+    /* ─── Search ────────────────────────────────── */
+    function setupSearch() {
+      const overlay  = document.getElementById('searchOverlay');
+      const input    = document.getElementById('searchInput');
+      const results  = document.getElementById('searchResults');
+      const openBtn  = document.getElementById('searchIconNav');
+      const closeBtn = document.getElementById('closeSearch');
+      if (!overlay || !input) return;
+
+      const open  = () => { overlay.classList.add('open'); setTimeout(() => input.focus(), 60); };
+      const close = () => { overlay.classList.remove('open'); input.value = ''; results.innerHTML = ''; };
+
+      if (openBtn)  openBtn.addEventListener('click', e => { e.preventDefault(); open(); });
+      if (closeBtn) closeBtn.addEventListener('click', close);
+      overlay.addEventListener('click', e => { if (e.target === overlay) close(); });
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+
+      const doSearch = debounce(q => {
+        if (q.length < 2) { results.innerHTML = ''; return; }
+        const found = allPosts.filter(p => p.title.toLowerCase().includes(q) || (p.categories || []).some(c => c.toLowerCase().includes(q)));
+        results.innerHTML = found.length
+          ? found.slice(0, 8).map(p => `<div class="search-result-item" data-id="${p.id}"><strong>${excerpt(p.title, 65)}</strong><span>${p.categories?.[0] ?? ''} · ${formatDate(p.published)}</span></div>`).join('')
+          : '<p style="color:rgba(240,224,200,0.5);text-align:center;padding:2rem">لا توجد نتائج</p>';
+        results.querySelectorAll('.search-result-item').forEach(item => {
+          item.addEventListener('click', () => { window.location.href = `article.html?id=${item.dataset.id}`; });
+        });
+      }, 280);
+
+      input.addEventListener('input', e => doSearch(e.target.value.trim().toLowerCase()));
+    }
+
+    /* ─── Newsletter ────────────────────────────── */
+    function setupNewsletter() {
+      const form = document.getElementById('newsletterForm');
+      if (!form) return;
+      form.addEventListener('submit', e => {
+        e.preventDefault();
+        const btn = form.querySelector('button');
+        btn.innerHTML = '<i class="fas fa-check"></i>';
+        btn.style.background = '#2c5a3e';
+        setTimeout(() => { btn.innerHTML = '<i class="fas fa-paper-plane"></i>'; btn.style.background = ''; form.reset(); }, 2500);
+      });
+    }
+
+    /* ─── Init ──────────────────────────────────── */
+    async function init() {
+      initReadingProgress();
+      setupSearch();
+      setupNewsletter();
+
+      const params = new URLSearchParams(window.location.search);
+      const postId = params.get('id');
+
+      if (!postId) {
+        document.getElementById('articleContainer').innerHTML = `
+          <div class="article-error">
+            <i class="fas fa-exclamation-triangle"></i>
+            <h2>لم يتم تحديد المقال</h2>
+            <p>الرابط غير صحيح أو المقال غير موجود.</p>
+            <a href="index.html" class="back-home" style="margin-top:1.5rem"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+          </div>`;
+        return;
+      }
+
+      try {
+        await fetchPosts();
+        const post = allPosts.find(p => p.id == postId);
+
+        if (!post) throw new Error('المقال غير موجود');
+
+        renderArticle(post);
+        renderRelated(post);
+        renderFooterCategories();
+
+      } catch (err) {
+        document.getElementById('articleContainer').innerHTML = `
+          <div class="article-error">
+            <i class="fas fa-exclamation-circle"></i>
+            <h2>تعذّر تحميل المقال</h2>
+            <p>${err.message}</p>
+            <a href="index.html" class="back-home" style="margin-top:1.5rem"><i class="fas fa-arrow-right"></i> العودة للرئيسية</a>
+          </div>`;
+      }
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+  })();
+  </script>
+</body>
+</html>
