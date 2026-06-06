@@ -1,0 +1,738 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+    <title id="pageTitle">Indigena • القسم</title>
+    <meta name="description" id="pageDesc" content="استكشف مقالات Indigena حسب القسم">
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* ═══ CATEGORY PAGE STYLES ═══ */
+
+        #scrollProgress {
+            position: fixed; top: 0; right: 0;
+            width: 0%; height: 3px;
+            background: linear-gradient(90deg, var(--gold, #d98c2b), #f5c842);
+            z-index: 9999; transition: width 0.1s linear;
+        }
+        #backToTop {
+            position: fixed; bottom: 2rem; left: 2rem;
+            width: 48px; height: 48px;
+            background: var(--gold, #d98c2b); color: white;
+            border: none; border-radius: 50%; font-size: 1.2rem;
+            cursor: pointer; display: flex; align-items: center; justify-content: center;
+            opacity: 0; transform: translateY(20px);
+            transition: all 0.3s ease; z-index: 999;
+            box-shadow: 0 4px 20px rgba(217,140,43,0.4);
+        }
+        #backToTop.visible { opacity: 1; transform: translateY(0); }
+        #backToTop:hover { background: #c07820; transform: translateY(-3px); }
+
+        /* ─── Category Hero ─── */
+        .category-hero {
+            position: relative; min-height: 300px;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+        .category-hero-bg {
+            position: absolute; inset: 0;
+            background: linear-gradient(135deg, #0f1f16 0%, #1f3b2c 40%, #2d1f12 80%, #1a0e08 100%);
+        }
+        .category-hero-bg::after {
+            content: ''; position: absolute; inset: 0;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.08'/%3E%3C/svg%3E");
+            opacity: 0.4;
+        }
+        .hero-geo { position: absolute; border-radius: 50%; opacity: 0.06; }
+        .hero-geo-1 { width: 500px; height: 500px; background: radial-gradient(circle, #d98c2b, transparent 70%); top: -150px; left: -100px; }
+        .hero-geo-2 { width: 300px; height: 300px; background: radial-gradient(circle, #2c7a47, transparent 70%); bottom: -80px; right: 10%; }
+
+        .category-hero-content {
+            position: relative; z-index: 2;
+            text-align: center; color: white;
+            padding: 3rem 2rem;
+            animation: heroReveal 0.8s ease forwards;
+        }
+        @keyframes heroReveal { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .hero-breadcrumb {
+            font-size: 0.85rem; opacity: 0.7; margin-bottom: 1rem;
+            display: flex; align-items: center; justify-content: center; gap: 0.5rem;
+        }
+        .hero-breadcrumb a { color: rgba(255,255,255,0.7); text-decoration: none; transition: color 0.2s; }
+        .hero-breadcrumb a:hover { color: #d98c2b; }
+        .hero-breadcrumb .sep { color: rgba(255,255,255,0.3); }
+
+        .hero-icon {
+            width: 70px; height: 70px;
+            background: rgba(217,140,43,0.2);
+            border: 1px solid rgba(217,140,43,0.4);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.2rem;
+            font-size: 1.6rem; color: #d98c2b;
+        }
+        .category-hero h1 {
+            font-family: 'Playfair Display', 'Cairo', serif;
+            font-size: clamp(2rem, 5vw, 3.2rem);
+            font-weight: 700; margin-bottom: 0.75rem;
+            text-shadow: 0 2px 20px rgba(0,0,0,0.3);
+        }
+        .hero-subtitle { font-size: 1rem; opacity: 0.7; margin-bottom: 1.5rem; }
+        .hero-stats {
+            display: inline-flex; gap: 2rem;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 50px; padding: 0.6rem 2rem;
+            backdrop-filter: blur(10px); font-size: 0.9rem;
+        }
+        .hero-stat { display: flex; align-items: center; gap: 0.4rem; opacity: 0.85; }
+        .hero-stat i { color: #d98c2b; font-size: 0.8rem; }
+
+        /* ─── Sections Nav Strip ─── */
+        .sections-strip {
+            background: #1a2e20;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+            padding: 0; overflow-x: auto; scrollbar-width: none;
+        }
+        .sections-strip::-webkit-scrollbar { display: none; }
+        .sections-strip-inner {
+            max-width: 1200px; margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex; gap: 0; white-space: nowrap;
+        }
+        .section-tab {
+            display: inline-flex; align-items: center; gap: 0.5rem;
+            padding: 1rem 1.4rem;
+            color: rgba(255,255,255,0.6);
+            text-decoration: none; font-size: 0.88rem; font-weight: 600;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s; cursor: pointer; white-space: nowrap;
+        }
+        .section-tab:hover { color: #d98c2b; }
+        .section-tab.active { color: #d98c2b; border-bottom-color: #d98c2b; }
+        .section-tab i { font-size: 0.82rem; }
+
+        /* ─── Filter Bar ─── */
+        .filter-bar {
+            background: white; border-bottom: 1px solid #e8ddd0;
+            padding: 0.85rem 0;
+            position: sticky; top: 70px; z-index: 100;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.05);
+        }
+        .filter-container {
+            max-width: 1200px; margin: 0 auto; padding: 0 1.5rem;
+            display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+        }
+        .filter-label {
+            font-size: 0.83rem; font-weight: 700; color: #5a3e2b;
+            white-space: nowrap; display: flex; align-items: center; gap: 0.4rem;
+        }
+        .filter-label i { color: #d98c2b; }
+        .filter-chips { display: flex; gap: 0.45rem; flex-wrap: wrap; flex: 1; }
+        .filter-chip {
+            padding: 0.3rem 0.9rem; border-radius: 50px;
+            font-size: 0.8rem; font-weight: 600; cursor: pointer;
+            border: 1.5px solid #e0d4c3; background: transparent; color: #6b5240;
+            font-family: 'Cairo', sans-serif; transition: all 0.2s;
+        }
+        .filter-chip:hover { border-color: #d98c2b; color: #d98c2b; }
+        .filter-chip.active { background: #d98c2b; border-color: #d98c2b; color: white; }
+        .results-label {
+            margin-right: auto; font-size: 0.82rem; color: #9a8070;
+            background: #f0e8de; padding: 0.3rem 0.9rem; border-radius: 50px;
+            white-space: nowrap;
+        }
+
+        /* ─── Posts Section ─── */
+        .posts-section { max-width: 1200px; margin: 0 auto; padding: 2.5rem 1.5rem; }
+        .section-header {
+            display: flex; align-items: center; justify-content: space-between;
+            margin-bottom: 2rem;
+        }
+        .section-header h2 {
+            font-size: 1.25rem; font-weight: 700; color: #2c2418;
+            display: flex; align-items: center; gap: 0.5rem;
+        }
+        .section-header h2 i { color: #d98c2b; }
+
+        /* ─── Posts Grid ─── */
+        .posts-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+        @media (max-width: 900px) { .posts-grid { grid-template-columns: repeat(2, 1fr); } }
+        @media (max-width: 580px)  { .posts-grid { grid-template-columns: 1fr; } .post-card.featured { grid-column: span 1; } }
+
+        .post-card.featured { grid-column: span 2; }
+        .post-card.featured .post-img { height: 280px; }
+        .post-card.featured .post-title { font-size: 1.25rem; }
+
+        .post-card {
+            background: white; border-radius: 20px; overflow: hidden;
+            cursor: pointer; display: flex; flex-direction: column;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.06);
+            transition: transform 0.3s, box-shadow 0.3s;
+            animation: cardReveal 0.5s ease backwards;
+        }
+        .post-card:hover { transform: translateY(-6px); box-shadow: 0 15px 40px rgba(0,0,0,0.12); }
+        @keyframes cardReveal { from { opacity:0; transform:translateY(20px); } to { opacity:1; transform:translateY(0); } }
+
+        .post-img {
+            position: relative; height: 210px;
+            background-size: cover; background-position: center; overflow: hidden;
+        }
+        .post-img::after {
+            content: ''; position: absolute; inset: 0;
+            background: linear-gradient(to top, rgba(20,12,4,0.7) 0%, transparent 55%);
+            transition: opacity 0.3s; opacity: 0.65;
+        }
+        .post-card:hover .post-img::after { opacity: 0.45; }
+        .post-section-badge {
+            position: absolute; top: 1rem; right: 1rem; z-index: 2;
+            background: #d98c2b; color: white;
+            padding: 0.22rem 0.7rem; border-radius: 50px;
+            font-size: 0.72rem; font-weight: 700;
+        }
+        .post-body { padding: 1.2rem; flex: 1; display: flex; flex-direction: column; }
+        .post-title {
+            font-size: 0.98rem; font-weight: 700; color: #2c2418;
+            line-height: 1.65; margin-bottom: 0.75rem; flex: 1;
+            display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+        }
+        .post-meta {
+            display: flex; align-items: center; gap: 1rem;
+            font-size: 0.76rem; color: #9a8070;
+            padding-top: 0.75rem; border-top: 1px solid #f0e8de;
+        }
+        .post-meta span { display: flex; align-items: center; gap: 0.3rem; }
+        .post-meta i { color: #d98c2b; }
+        .post-read-more {
+            margin-top: 0.75rem; font-size: 0.78rem; font-weight: 700; color: #d98c2b;
+            display: flex; align-items: center; gap: 0.4rem;
+            opacity: 0; transform: translateX(5px); transition: all 0.3s;
+        }
+        .post-card:hover .post-read-more { opacity: 1; transform: translateX(0); }
+
+        /* Skeleton */
+        .skeleton-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 2px 15px rgba(0,0,0,0.05); }
+        .skeleton-img { height: 210px; background: linear-gradient(90deg, #f0e8de 25%, #e0d0c0 50%, #f0e8de 75%); background-size:200% 100%; animation: shimmer 1.5s infinite; }
+        .skeleton-body { padding: 1.2rem; }
+        .skeleton-line { height: 13px; border-radius: 7px; margin-bottom: 0.65rem; background: linear-gradient(90deg, #f0e8de 25%, #e0d0c0 50%, #f0e8de 75%); background-size:200% 100%; animation: shimmer 1.5s infinite; }
+        .skeleton-line.short { width:60%; } .skeleton-line.shorter { width:40%; }
+        @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+
+        /* Empty State */
+        .empty-state { grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: #8a7060; }
+        .empty-state i { font-size: 3rem; color: #d98c2b; opacity: 0.4; margin-bottom: 1rem; display: block; }
+        .empty-state h3 { font-size: 1.3rem; margin-bottom: 0.5rem; color: #4a3828; }
+
+        /* Load More */
+        .load-more-container { text-align: center; margin-top: 2.5rem; }
+        .load-more-btn {
+            display: inline-flex; align-items: center; gap: 0.6rem;
+            background: transparent; border: 2px solid #d98c2b; color: #d98c2b;
+            padding: 0.8rem 2.5rem; border-radius: 50px;
+            font-family: 'Cairo', sans-serif; font-size: 0.95rem; font-weight: 700;
+            cursor: pointer; transition: all 0.3s;
+        }
+        .load-more-btn:hover { background: #d98c2b; color: white; transform: translateY(-2px); box-shadow: 0 8px 25px rgba(217,140,43,0.3); }
+        .load-more-btn.loading { opacity: 0.7; pointer-events: none; }
+        .load-more-btn .fa-spinner { display: none; }
+        .load-more-btn.loading .fa-spinner { display: inline-block; }
+        .load-more-btn.loading .fa-arrow-down { display: none; }
+
+        /* ─── Related Sections ─── */
+        .related-section {
+            background: #f8f3ed; border-top: 1px solid #e8ddd0;
+            padding: 2.5rem 1.5rem; margin-top: 1rem;
+        }
+        .related-inner { max-width: 1200px; margin: 0 auto; }
+        .related-inner h3 { font-size: 1.1rem; font-weight: 700; color: #2c2418; margin-bottom: 1.2rem; }
+        .sections-cards {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 0.85rem;
+        }
+        .section-card {
+            background: white; border: 1px solid #e8ddd0; border-radius: 18px;
+            padding: 1.2rem; text-align: center; cursor: pointer;
+            transition: all 0.25s; text-decoration: none; display: block;
+        }
+        .section-card:hover {
+            border-color: #d98c2b; background: #fffaf5;
+            transform: translateY(-3px); box-shadow: 0 6px 20px rgba(217,140,43,0.12);
+        }
+        .section-card.current-section { border-color: #d98c2b; background: #fff8ef; }
+        .section-card .s-icon {
+            width: 48px; height: 48px; border-radius: 50%;
+            background: #f0e8de; margin: 0 auto 0.65rem;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 1.15rem; color: #d98c2b;
+        }
+        .section-card .s-name { font-size: 0.85rem; font-weight: 700; color: #2c2418; }
+        .section-card .s-count { font-size: 0.73rem; color: #9a8070; margin-top: 0.2rem; }
+
+        /* ─── Search Overlay ─── */
+        .search-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.85);
+            display: none; justify-content: center; align-items: flex-start;
+            z-index: 9000; padding-top: 10vh; backdrop-filter: blur(4px);
+        }
+        .search-modal {
+            background: #1e1914; border-radius: 24px; padding: 2rem;
+            width: 90%; max-width: 600px; position: relative;
+        }
+        .close-search { position: absolute; top: 1rem; left: 1rem; color: rgba(255,255,255,0.5); font-size: 1.3rem; cursor: pointer; transition: color 0.2s; }
+        .close-search:hover { color: white; }
+        #searchInput {
+            width: 100%; padding: 0.9rem 1.2rem; border-radius: 50px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.08); color: white;
+            font-family: 'Cairo', sans-serif; font-size: 1rem; outline: none;
+            box-sizing: border-box;
+        }
+        #searchInput:focus { border-color: #d98c2b; }
+        #searchInput::placeholder { color: rgba(255,255,255,0.4); }
+        #searchResults { margin-top: 1rem; max-height: 50vh; overflow-y: auto; }
+        .sr-item { padding: 0.9rem 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); cursor: pointer; border-radius: 10px; transition: background 0.2s; }
+        .sr-item:hover { background: rgba(255,255,255,0.07); }
+        .sr-title { color: white; font-size: 0.92rem; font-weight: 600; }
+        .sr-cat { color: #d98c2b; font-size: 0.76rem; margin-top: 0.2rem; }
+
+        /* Dark Mode */
+        body.dark-mode { background: #12100d; }
+        body.dark-mode .filter-bar { background: #1a1612; border-color: #2e2820; }
+        body.dark-mode .filter-chip { background: #2c2418; border-color: #3e3020; color: #c8b89a; }
+        body.dark-mode .post-card, body.dark-mode .skeleton-card { background: #1e1a14; }
+        body.dark-mode .post-title { color: #e8d8c0; }
+        body.dark-mode .post-meta { border-top-color: #2c2418; }
+        body.dark-mode .related-section { background: #1a1612; }
+        body.dark-mode .section-card { background: #2c2418; border-color: #3e3020; }
+        body.dark-mode .s-name { color: #e8d8c0; }
+    </style>
+</head>
+<body>
+
+<div id="scrollProgress"></div>
+<button id="backToTop" aria-label="العودة للأعلى"><i class="fas fa-arrow-up"></i></button>
+
+<!-- ═══ NAVBAR ═══ -->
+<nav class="navbar">
+    <div class="nav-container">
+        <a href="index.html" class="logo">
+            <i class="fas fa-feather-alt"></i><span>Indigena</span>
+        </a>
+        <div class="nav-links" id="navLinks">
+            <a href="index.html" class="nav-link">الرئيسية</a>
+            <a href="category.html?cat=%D8%A3%D8%AE%D8%A8%D8%A7%D8%B1" class="nav-link" data-section="أخبار">أخبار</a>
+            <a href="category.html?cat=%D8%A7%D9%84%D8%B4%D8%B9%D9%88%D8%A8" class="nav-link" data-section="الشعوب">الشعوب</a>
+            <a href="category.html?cat=%D8%A7%D9%84%D8%AB%D9%82%D8%A7%D9%81%D8%A9" class="nav-link" data-section="الثقافة">الثقافة</a>
+            <a href="category.html?cat=%D8%A7%D9%84%D8%AD%D9%82%D9%88%D9%82" class="nav-link" data-section="الحقوق">الحقوق</a>
+            <a href="category.html?cat=%D8%A7%D9%84%D8%A3%D8%B7%D9%84%D8%B3" class="nav-link" data-section="الأطلس">الأطلس</a>
+            <a href="#" id="searchIconNav" aria-label="بحث"><i class="fas fa-search"></i></a>
+            <button id="darkModeToggle" style="background:none;border:none;cursor:pointer;color:inherit;font-size:1rem;padding:0 0.5rem;" aria-label="الوضع الليلي">
+                <i class="fas fa-moon"></i>
+            </button>
+        </div>
+        <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="القائمة"><i class="fas fa-bars"></i></button>
+    </div>
+</nav>
+
+<!-- ═══ CATEGORY HERO ═══ -->
+<div class="category-hero">
+    <div class="category-hero-bg"></div>
+    <div class="hero-geo hero-geo-1"></div>
+    <div class="hero-geo hero-geo-2"></div>
+    <div class="category-hero-content">
+        <div class="hero-breadcrumb">
+            <a href="index.html"><i class="fas fa-home"></i> الرئيسية</a>
+            <span class="sep">›</span>
+            <span id="breadcrumbCat">...</span>
+        </div>
+        <div class="hero-icon" id="categoryIcon"><i class="fas fa-layer-group"></i></div>
+        <h1 id="categoryName">تحميل...</h1>
+        <p class="hero-subtitle" id="heroSubtitle">استكشف أعمق المقالات في هذا القسم</p>
+        <div class="hero-stats">
+            <div class="hero-stat"><i class="fas fa-newspaper"></i><span id="statCount">—</span></div>
+            <div class="hero-stat"><i class="fas fa-calendar-alt"></i><span id="statLatest">—</span></div>
+        </div>
+    </div>
+</div>
+
+<!-- ═══ SECTIONS TABS ═══ -->
+<div class="sections-strip">
+    <div class="sections-strip-inner" id="sectionsTabs"></div>
+</div>
+
+<!-- ═══ FILTER BAR ═══ -->
+<div class="filter-bar">
+    <div class="filter-container">
+        <span class="filter-label"><i class="fas fa-sort-amount-down"></i> ترتيب:</span>
+        <div class="filter-chips">
+            <button class="filter-chip active" data-sort="newest">الأحدث أولاً</button>
+            <button class="filter-chip" data-sort="oldest">الأقدم أولاً</button>
+            <button class="filter-chip" data-sort="images">الأكثر صوراً</button>
+        </div>
+        <span class="results-label" id="resultsCount">جاري التحميل...</span>
+    </div>
+</div>
+
+<!-- ═══ POSTS ═══ -->
+<section class="posts-section">
+    <div class="section-header">
+        <h2><i class="fas fa-th-large"></i> جميع المقالات</h2>
+    </div>
+    <div class="posts-grid" id="postsGrid">
+        <div class="skeleton-card" style="grid-column:span 2"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+        <div class="skeleton-card"><div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line"></div><div class="skeleton-line short"></div></div></div>
+    </div>
+    <div class="load-more-container" id="loadMoreContainer" style="display:none">
+        <button id="loadMoreBtn" class="load-more-btn">
+            <i class="fas fa-arrow-down"></i>
+            <i class="fas fa-spinner fa-spin"></i>
+            تحميل المزيد
+        </button>
+    </div>
+</section>
+
+<!-- ═══ RELATED SECTIONS ═══ -->
+<div class="related-section">
+    <div class="related-inner">
+        <h3><i class="fas fa-compass" style="color:#d98c2b;margin-left:0.5rem"></i> استكشف الأقسام الأخرى</h3>
+        <div class="sections-cards" id="relatedSections"></div>
+    </div>
+</div>
+
+<!-- ═══ FOOTER ═══ -->
+<footer class="footer">
+    <div class="footer-container">
+        <div class="footer-about">
+            <h3><i class="fas fa-feather-alt"></i> Indigena</h3>
+            <p>منصة إعلامية متخصصة في قضايا السكان الأصليين، ننقل الحكاية كما هي، ونوثق التراث ونناقش المستقبل.</p>
+            <div class="footer-social">
+                <a href="#" aria-label="تويتر"><i class="fab fa-twitter"></i></a>
+                <a href="#" aria-label="فيسبوك"><i class="fab fa-facebook-f"></i></a>
+                <a href="#" aria-label="إنستغرام"><i class="fab fa-instagram"></i></a>
+                <a href="#" aria-label="يوتيوب"><i class="fab fa-youtube"></i></a>
+            </div>
+        </div>
+        <div class="footer-links">
+            <h4>روابط سريعة</h4>
+            <ul>
+                <li><a href="index.html">الرئيسية</a></li>
+                <li><a href="#">عن المنصة</a></li>
+                <li><a href="#">اتصل بنا</a></li>
+                <li><a href="#">سياسة الخصوصية</a></li>
+            </ul>
+        </div>
+        <div class="footer-categories" id="footerCategories">
+            <h4>الأقسام</h4>
+            <ul></ul>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <p>&copy; 2025 Indigena. جميع الحقوق محفوظة.</p>
+    </div>
+</footer>
+
+<!-- ═══ SEARCH OVERLAY ═══ -->
+<div class="search-overlay" id="searchOverlay">
+    <div class="search-modal">
+        <i class="fas fa-times close-search" id="closeSearch"></i>
+        <input type="text" id="searchInput" placeholder="ابحث عن عنوان أو موضوع..." autocomplete="off">
+        <div id="searchResults"></div>
+    </div>
+</div>
+
+<script>
+(function() {
+    'use strict';
+
+    /* ─── الأقسام الخمسة ─── */
+    const SECTIONS = [
+        { key: 'أخبار',    icon: 'fa-newspaper',     subtitle: 'آخر الأخبار والمستجدات المتعلقة بالشعوب الأصلية' },
+        { key: 'الشعوب',  icon: 'fa-globe-africa',   subtitle: 'تعرّف على شعوب العالم الأصلية وتاريخها وثقافتها' },
+        { key: 'الثقافة', icon: 'fa-palette',        subtitle: 'الفنون والتراث واللغات والطقوس والتعبيرات الثقافية' },
+        { key: 'الحقوق',  icon: 'fa-gavel',          subtitle: 'القضايا الحقوقية والأرض والقانون الدولي' },
+        { key: 'الأطلس',  icon: 'fa-map-marked-alt', subtitle: 'استكشاف جغرافي لمناطق الشعوب الأصلية حول العالم' },
+    ];
+
+    const PLACEHOLDER = 'https://placehold.co/600x400/1a3a28/c8a45a?text=Indigena';
+
+    const state = {
+        allPosts: [],
+        sectionPosts: [],
+        currentSection: '',
+        currentPage: 1,
+        postsPerPage: 9,
+        sortBy: 'newest',
+    };
+
+    /* ─── Helpers ─── */
+    function getSection(post) {
+        return post.section || (post.categories || [])[0] || 'أخبار';
+    }
+
+    function formatDate(str) {
+        try { return new Date(str).toLocaleDateString('ar-EG', { year:'numeric', month:'short', day:'numeric' }); }
+        catch(_) { return str; }
+    }
+
+    function readingTime(content) {
+        if (!content) return '1 دقيقة';
+        const tmp = document.createElement('div');
+        tmp.innerHTML = content;
+        const words = (tmp.textContent || '').trim().split(/\s+/).length;
+        return Math.max(1, Math.ceil(words / 150)) + ' دقائق قراءة';
+    }
+
+    function getSectionMeta(key) {
+        return SECTIONS.find(s => s.key === key) || { icon: 'fa-layer-group', subtitle: '' };
+    }
+
+    /* ─── Load Data ─── */
+    async function loadData() {
+        const res = await fetch('posts.json?v=' + Date.now());
+        const data = await res.json();
+        return data.posts || [];
+    }
+
+    /* ─── Init ─── */
+    async function init() {
+        const params = new URLSearchParams(window.location.search);
+        state.currentSection = decodeURIComponent(params.get('cat') || '');
+        if (!state.currentSection) { window.location.href = 'index.html'; return; }
+
+        if (localStorage.getItem('indigena_dark') === '1') {
+            document.body.classList.add('dark-mode');
+            document.querySelector('#darkModeToggle i').className = 'fas fa-sun';
+        }
+
+        try {
+            state.allPosts = await loadData();
+        } catch(e) {
+            console.error(e);
+            state.allPosts = [];
+        }
+
+        applyFilter();
+        updateHero();
+        renderSectionsTabs();
+        renderPosts(true);
+        renderRelatedSections();
+        renderFooterSections();
+        highlightActiveNav();
+        setupEvents();
+    }
+
+    /* ─── Apply Filter + Sort ─── */
+    function applyFilter() {
+        let posts = state.allPosts.filter(p => getSection(p) === state.currentSection);
+        if (state.sortBy === 'newest')  posts.sort((a,b) => new Date(b.published) - new Date(a.published));
+        if (state.sortBy === 'oldest')  posts.sort((a,b) => new Date(a.published) - new Date(b.published));
+        if (state.sortBy === 'images')  posts.sort((a,b) => (b.image_count||0) - (a.image_count||0));
+        state.sectionPosts = posts;
+        state.currentPage = 1;
+    }
+
+    /* ─── Update Hero ─── */
+    function updateHero() {
+        const meta = getSectionMeta(state.currentSection);
+        document.title = `Indigena • ${state.currentSection}`;
+        document.getElementById('categoryName').textContent = state.currentSection;
+        document.getElementById('breadcrumbCat').textContent = state.currentSection;
+        document.getElementById('categoryIcon').innerHTML = `<i class="fas ${meta.icon}"></i>`;
+        document.getElementById('heroSubtitle').textContent = meta.subtitle || 'استكشف مقالات هذا القسم';
+        document.getElementById('statCount').textContent = state.sectionPosts.length + ' مقال';
+        if (state.sectionPosts.length > 0) {
+            const d = new Date(state.sectionPosts[0].published);
+            document.getElementById('statLatest').textContent = d.toLocaleDateString('ar-EG', { year:'numeric', month:'long' });
+        }
+        document.getElementById('resultsCount').textContent = state.sectionPosts.length + ' مقال';
+    }
+
+    /* ─── Render Sections Tabs ─── */
+    function renderSectionsTabs() {
+        const container = document.getElementById('sectionsTabs');
+        const counts = {};
+        state.allPosts.forEach(p => { const s = getSection(p); counts[s] = (counts[s]||0)+1; });
+        container.innerHTML = SECTIONS.map(s => `
+            <a class="section-tab${s.key === state.currentSection ? ' active' : ''}"
+               href="category.html?cat=${encodeURIComponent(s.key)}">
+                <i class="fas ${s.icon}"></i> ${s.key}
+                <span style="opacity:0.5;font-size:0.75rem;margin-right:0.3rem">(${counts[s.key]||0})</span>
+            </a>`).join('');
+    }
+
+    /* ─── Render Posts ─── */
+    function renderPosts(reset = false) {
+        const grid = document.getElementById('postsGrid');
+        const start = (state.currentPage - 1) * state.postsPerPage;
+        const page  = state.sectionPosts.slice(start, start + state.postsPerPage);
+
+        if (reset) grid.innerHTML = '';
+
+        if (page.length === 0 && state.currentPage === 1) {
+            grid.innerHTML = `
+                <div class="empty-state">
+                    <i class="fas fa-inbox"></i>
+                    <h3>لا توجد مقالات في هذا القسم بعد</h3>
+                    <p>سيتم إضافة محتوى قريباً.</p>
+                </div>`;
+            document.getElementById('loadMoreContainer').style.display = 'none';
+            return;
+        }
+
+        page.forEach((post, idx) => {
+            const isFeatured = (start === 0 && idx === 0);
+            const card = document.createElement('div');
+            card.className = `post-card${isFeatured ? ' featured' : ''}`;
+            card.style.animationDelay = (idx * 55) + 'ms';
+            card.dataset.id = post.id;
+            const bg = post.thumbnail || PLACEHOLDER;
+            const dateStr = formatDate(post.published);
+            const sec = getSection(post);
+            card.innerHTML = `
+                <div class="post-img" style="background-image:url('${bg}')">
+                    <span class="post-section-badge">${sec}</span>
+                </div>
+                <div class="post-body">
+                    <h3 class="post-title">${post.title || 'بدون عنوان'}</h3>
+                    <div class="post-meta">
+                        <span><i class="far fa-calendar-alt"></i> ${dateStr}</span>
+                        <span><i class="far fa-clock"></i> ${readingTime(post.content)}</span>
+                    </div>
+                    <div class="post-read-more">اقرأ المقال <i class="fas fa-arrow-left"></i></div>
+                </div>`;
+            card.addEventListener('click', () => { window.location.href = `article.html?id=${post.id}`; });
+            grid.appendChild(card);
+        });
+
+        const hasMore = state.sectionPosts.length > state.currentPage * state.postsPerPage;
+        document.getElementById('loadMoreContainer').style.display = hasMore ? 'block' : 'none';
+        document.getElementById('loadMoreBtn').classList.remove('loading');
+    }
+
+    /* ─── Render Related Sections ─── */
+    function renderRelatedSections() {
+        const container = document.getElementById('relatedSections');
+        const counts = {};
+        state.allPosts.forEach(p => { const s = getSection(p); counts[s] = (counts[s]||0)+1; });
+        container.innerHTML = SECTIONS.map(s => `
+            <a class="section-card${s.key === state.currentSection ? ' current-section' : ''}"
+               href="category.html?cat=${encodeURIComponent(s.key)}">
+                <div class="s-icon"><i class="fas ${s.icon}"></i></div>
+                <div class="s-name">${s.key}</div>
+                <div class="s-count">${counts[s.key]||0} مقال</div>
+            </a>`).join('');
+    }
+
+    /* ─── Footer ─── */
+    function renderFooterSections() {
+        const ul = document.querySelector('#footerCategories ul');
+        if (!ul) return;
+        ul.innerHTML = SECTIONS.map(s =>
+            `<li><a href="category.html?cat=${encodeURIComponent(s.key)}">
+                <i class="fas ${s.icon}" style="margin-left:0.4rem;color:#d98c2b;font-size:0.8rem"></i>${s.key}
+            </a></li>`).join('');
+    }
+
+    /* ─── Highlight Active Nav ─── */
+    function highlightActiveNav() {
+        document.querySelectorAll('.nav-link[data-section]').forEach(a => {
+            if (a.dataset.section === state.currentSection) a.classList.add('active');
+        });
+    }
+
+    /* ─── Search ─── */
+    let searchTimer;
+    function handleSearch(q) {
+        const results = document.getElementById('searchResults');
+        if (q.length < 2) { results.innerHTML = ''; return; }
+        const hits = state.allPosts.filter(p =>
+            (p.title||'').toLowerCase().includes(q) ||
+            (p.section||'').includes(q) ||
+            (p.categories||[]).some(c => c.includes(q))
+        ).slice(0, 8);
+        if (!hits.length) {
+            results.innerHTML = '<p style="color:rgba(255,255,255,0.4);text-align:center;padding:1rem">لا توجد نتائج</p>';
+            return;
+        }
+        results.innerHTML = hits.map(p => `
+            <div class="sr-item" onclick="location.href='article.html?id=${p.id}'">
+                <div class="sr-title">${(p.title||'').substring(0,70)}</div>
+                <div class="sr-cat">${getSection(p)}</div>
+            </div>`).join('');
+    }
+
+    /* ─── Events ─── */
+    function setupEvents() {
+        // Scroll progress + back to top
+        const bar = document.getElementById('scrollProgress');
+        const top = document.getElementById('backToTop');
+        window.addEventListener('scroll', () => {
+            const s = window.scrollY, h = document.documentElement.scrollHeight - window.innerHeight;
+            bar.style.width = (h > 0 ? s/h*100 : 0) + '%';
+            top.classList.toggle('visible', s > 400);
+        }, { passive: true });
+        top.addEventListener('click', () => window.scrollTo({ top:0, behavior:'smooth' }));
+
+        // Dark mode
+        document.getElementById('darkModeToggle').addEventListener('click', () => {
+            document.body.classList.toggle('dark-mode');
+            const isDark = document.body.classList.contains('dark-mode');
+            document.querySelector('#darkModeToggle i').className = isDark ? 'fas fa-sun' : 'fas fa-moon';
+            localStorage.setItem('indigena_dark', isDark ? '1' : '0');
+        });
+
+        // Sort
+        document.querySelectorAll('.filter-chip[data-sort]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                document.querySelectorAll('.filter-chip[data-sort]').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                state.sortBy = btn.dataset.sort;
+                applyFilter();
+                renderPosts(true);
+            });
+        });
+
+        // Load more
+        document.getElementById('loadMoreBtn').addEventListener('click', () => {
+            document.getElementById('loadMoreBtn').classList.add('loading');
+            setTimeout(() => { state.currentPage++; renderPosts(false); }, 350);
+        });
+
+        // Search
+        const overlay = document.getElementById('searchOverlay');
+        const input   = document.getElementById('searchInput');
+        document.getElementById('searchIconNav').addEventListener('click', e => {
+            e.preventDefault(); overlay.style.display = 'flex'; setTimeout(() => input.focus(), 80);
+        });
+        document.getElementById('closeSearch').addEventListener('click', () => { overlay.style.display = 'none'; });
+        overlay.addEventListener('click', e => { if (e.target === overlay) overlay.style.display = 'none'; });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') overlay.style.display = 'none'; });
+        input.addEventListener('input', e => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => handleSearch(e.target.value.trim().toLowerCase()), 280);
+        });
+
+        // Mobile menu
+        const mobileBtn = document.getElementById('mobileMenuBtn');
+        const navLinks  = document.getElementById('navLinks');
+        mobileBtn.addEventListener('click', () => {
+            navLinks.classList.toggle('mobile-open');
+            const open = navLinks.classList.contains('mobile-open');
+            mobileBtn.innerHTML = open ? '<i class="fas fa-times"></i>' : '<i class="fas fa-bars"></i>';
+        });
+    }
+
+    document.addEventListener('DOMContentLoaded', init);
+})();
+</script>
+</body>
+</html>
