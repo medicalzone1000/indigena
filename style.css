@@ -440,8 +440,9 @@ ul, ol { list-style: none; }
 .hero-bg {
   position: absolute;
   inset: 0;
+  /* تم تخفيف الفلتر: تقليل العتامة (opacity) في التدرج اللوني */
   background:
-    linear-gradient(160deg, rgba(15, 35, 24, 0.82) 0%, rgba(44, 31, 18, 0.75) 50%, rgba(10, 8, 5, 0.90) 100%),
+    linear-gradient(160deg, rgba(15, 35, 24, 0.45) 0%, rgba(44, 31, 18, 0.4) 50%, rgba(10, 8, 5, 0.55) 100%),
     url('https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?w=1800&q=80') center/cover no-repeat;
   transform: scale(1.04);
   animation: heroZoom 14s ease-in-out infinite alternate;
@@ -575,55 +576,19 @@ ul, ol { list-style: none; }
   transform: translateY(-3px);
 }
 
+/* حذف زر التمرير المتحرك (hero-scroll-indicator) */
 .hero-scroll-indicator {
-  position: absolute;
-  bottom: 96px;
-  left: 50%;
-  transform: translateX(-50%);
-  z-index: 3;
-  color: rgba(240, 224, 200, 0.5);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: var(--sp-1);
-  font-size: 0.7rem;
-  letter-spacing: 0.15em;
-  text-transform: uppercase;
-  animation: scrollBounce 2.5s ease-in-out infinite;
-}
-@keyframes scrollBounce {
-  0%,100% { transform: translateX(-50%) translateY(0); opacity: 0.5; }
-  50%      { transform: translateX(-50%) translateY(8px); opacity: 0.9; }
+  display: none;
 }
 
-/* Hero Stats Bar */
+/* حذف جدول الإحصائيات (hero-stats) */
 .hero-stats {
-  position: absolute;
-  bottom: 90px;
-  right: var(--sp-8);
-  z-index: 3;
-  display: flex;
-  gap: var(--sp-6);
-  animation: heroFadeUp 1s 0.8s var(--ease-smooth) both;
+  display: none;
 }
-.hero-stat {
-  text-align: center;
-}
-.hero-stat .num {
-  display: block;
-  font-family: var(--font-display);
-  font-size: 1.6rem;
-  font-weight: 700;
-  color: var(--clr-gold-light);
-  line-height: 1;
-}
-.hero-stat .lbl {
-  display: block;
-  font-size: 0.65rem;
-  color: rgba(240, 224, 200, 0.6);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  margin-top: var(--sp-1);
+
+/* Hero Stats Bar (مخفي) */
+.hero-stats {
+  display: none;
 }
 
 /* ===== SECTION HEADERS ===== */
@@ -3030,4 +2995,3 @@ ul, ol { list-style: none; }
   margin: 0 auto;
   padding: 0 var(--sp-8);
 }
-
