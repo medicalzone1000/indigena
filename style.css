@@ -346,6 +346,7 @@ ul, ol { list-style: none; }
   cursor: pointer;
   padding: var(--sp-2);
    margin-right: auto;
+   margin-top: 25px
 }
 
 /* Dropdown */
